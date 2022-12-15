@@ -13,57 +13,28 @@ generator client {
 }
 
 model User {
-  id                     String         @id @default(cuid())
-  name                   String         @default("")
-  email                  String         @unique @default("")
-  password               String
-  firstName              String         @default("")
-  lastName               String         @default("")
-  createdTasks           Task[]         @relation("Task_createdBy")
-  assignedTasks          Task[]         @relation("Task_assignedUser")
-  from_AssigneeUser_user AssigneeUser[] @relation("AssigneeUser_user")
+  id            String  @id @default(cuid())
+  email         String  @unique @default("")
+  isAdmin       Boolean @default(false)
+  password      String
+  username      String  @unique @default("")
+  createdModels Model[] @relation("Model_createdBy")
 }
 
-model AssigneeUser {
-  id        String   @id @default(cuid())
-  project   Project? @relation("AssigneeUser_project", fields: [projectId], references: [id])
-  projectId String?  @map("project")
-  user      User?    @relation("AssigneeUser_user", fields: [userId], references: [id])
-  userId    String?  @map("user")
-  role      String?
-
-  @@index([projectId])
-  @@index([userId])
-}
-
-model Project {
-  id                        String         @id @default(cuid())
-  title                     String         @default("")
-  description               String         @default("")
-  tasks                     Task[]         @relation("Task_project")
-  from_AssigneeUser_project AssigneeUser[] @relation("AssigneeUser_project")
-}
-
-model Task {
+model Model {
   id                   String    @id @default(cuid())
-  project              Project?  @relation("Task_project", fields: [projectId], references: [id])
-  projectId            String?   @map("project")
-  createdBy            User?     @relation("Task_createdBy", fields: [createdById], references: [id])
-  createdById          String?   @map("createdBy")
-  assignedUser         User?     @relation("Task_assignedUser", fields: [assignedUserId], references: [id])
-  assignedUserId       String?   @map("assignedUser")
-  dueDate              DateTime?
-  estimatedTime        Int?
-  priority             String?
   name                 String    @default("")
   description          String    @default("")
-  status               String?   @default("backlog")
-  parentTask           Task?     @relation("Task_parentTask", fields: [parentTaskId], references: [id])
-  parentTaskId         String?   @map("parentTask")
-  from_Task_parentTask Task[]    @relation("Task_parentTask")
+  modelFile_filesize   Int?
+  modelFile_filename   String?
+  modelImage_filesize  Int?
+  modelImage_extension String?
+  modelImage_width     Int?
+  modelImage_height    Int?
+  modelImage_id        String?
+  createdAt            DateTime? @default(now())
+  createdBy            User?     @relation("Model_createdBy", fields: [createdById], references: [id])
+  createdById          String?   @map("createdBy")
 
-  @@index([projectId])
   @@index([createdById])
-  @@index([assignedUserId])
-  @@index([parentTaskId])
 }

@@ -3,3 +3,5 @@ node_modules
 keystone.db
 *.log
 .keystone
+.env
+.DS_Store

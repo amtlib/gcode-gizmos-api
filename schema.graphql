@@ -3,15 +3,12 @@
 
 type User {
   id: ID!
-  name: String
   email: String
+  isAdmin: Boolean
   password: PasswordState
-  firstName: String
-  lastName: String
-  createdTasks(where: TaskWhereInput! = {}, orderBy: [TaskOrderByInput!]! = [], take: Int, skip: Int! = 0): [Task!]
-  createdTasksCount(where: TaskWhereInput! = {}): Int
-  assignedTasks(where: TaskWhereInput! = {}, orderBy: [TaskOrderByInput!]! = [], take: Int, skip: Int! = 0): [Task!]
-  assignedTasksCount(where: TaskWhereInput! = {}): Int
+  username: String
+  createdModels(where: ModelWhereInput! = {}, orderBy: [ModelOrderByInput!]! = [], take: Int, skip: Int! = 0): [Model!]
+  createdModelsCount(where: ModelWhereInput! = {}): Int
 }
 
 type PasswordState {
@@ -21,6 +18,7 @@ type PasswordState {
 input UserWhereUniqueInput {
   id: ID
   email: String
+  username: String
 }
 
 input UserWhereInput {
@@ -28,12 +26,10 @@ input UserWhereInput {
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]
   id: IDFilter
-  name: StringFilter
   email: StringFilter
-  firstName: StringFilter
-  lastName: StringFilter
-  createdTasks: TaskManyRelationFilter
-  assignedTasks: TaskManyRelationFilter
+  isAdmin: BooleanFilter
+  username: StringFilter
+  createdModels: ModelManyRelationFilter
 }
 
 input IDFilter {
@@ -75,18 +71,22 @@ input NestedStringFilter {
   not: NestedStringFilter
 }
 
-input TaskManyRelationFilter {
-  every: TaskWhereInput
-  some: TaskWhereInput
-  none: TaskWhereInput
+input BooleanFilter {
+  equals: Boolean
+  not: BooleanFilter
+}
+
+input ModelManyRelationFilter {
+  every: ModelWhereInput
+  some: ModelWhereInput
+  none: ModelWhereInput
 }
 
 input UserOrderByInput {
   id: OrderDirection
-  name: OrderDirection
   email: OrderDirection
-  firstName: OrderDirection
-  lastName: OrderDirection
+  isAdmin: OrderDirection
+  username: OrderDirection
 }
 
 enum OrderDirection {
@@ -95,20 +95,18 @@ enum OrderDirection {
 }
 
 input UserUpdateInput {
-  name: String
   email: String
+  isAdmin: Boolean
   password: String
-  firstName: String
-  lastName: String
-  createdTasks: TaskRelateToManyForUpdateInput
-  assignedTasks: TaskRelateToManyForUpdateInput
+  username: String
+  createdModels: ModelRelateToManyForUpdateInput
 }
 
-input TaskRelateToManyForUpdateInput {
-  disconnect: [TaskWhereUniqueInput!]
-  set: [TaskWhereUniqueInput!]
-  create: [TaskCreateInput!]
-  connect: [TaskWhereUniqueInput!]
+input ModelRelateToManyForUpdateInput {
+  disconnect: [ModelWhereUniqueInput!]
+  set: [ModelWhereUniqueInput!]
+  create: [ModelCreateInput!]
+  connect: [ModelWhereUniqueInput!]
 }
 
 input UserUpdateArgs {
@@ -117,193 +115,65 @@ input UserUpdateArgs {
 }
 
 input UserCreateInput {
-  name: String
   email: String
+  isAdmin: Boolean
   password: String
-  firstName: String
-  lastName: String
-  createdTasks: TaskRelateToManyForCreateInput
-  assignedTasks: TaskRelateToManyForCreateInput
+  username: String
+  createdModels: ModelRelateToManyForCreateInput
 }
 
-input TaskRelateToManyForCreateInput {
-  create: [TaskCreateInput!]
-  connect: [TaskWhereUniqueInput!]
+input ModelRelateToManyForCreateInput {
+  create: [ModelCreateInput!]
+  connect: [ModelWhereUniqueInput!]
 }
 
-type AssigneeUser {
+type Model {
   id: ID!
-  project: Project
-  user: User
-  role: AssigneeUserRoleType
-}
-
-enum AssigneeUserRoleType {
-  admin
-  manager
-  client
-  user
-}
-
-input AssigneeUserWhereUniqueInput {
-  id: ID
-}
-
-input AssigneeUserWhereInput {
-  AND: [AssigneeUserWhereInput!]
-  OR: [AssigneeUserWhereInput!]
-  NOT: [AssigneeUserWhereInput!]
-  id: IDFilter
-  project: ProjectWhereInput
-  user: UserWhereInput
-  role: AssigneeUserRoleTypeNullableFilter
-}
-
-input AssigneeUserRoleTypeNullableFilter {
-  equals: AssigneeUserRoleType
-  in: [AssigneeUserRoleType!]
-  notIn: [AssigneeUserRoleType!]
-  not: AssigneeUserRoleTypeNullableFilter
-}
-
-input AssigneeUserOrderByInput {
-  id: OrderDirection
-  role: OrderDirection
-}
-
-input AssigneeUserUpdateInput {
-  project: ProjectRelateToOneForUpdateInput
-  user: UserRelateToOneForUpdateInput
-  role: AssigneeUserRoleType
-}
-
-input ProjectRelateToOneForUpdateInput {
-  create: ProjectCreateInput
-  connect: ProjectWhereUniqueInput
-  disconnect: Boolean
-}
-
-input UserRelateToOneForUpdateInput {
-  create: UserCreateInput
-  connect: UserWhereUniqueInput
-  disconnect: Boolean
-}
-
-input AssigneeUserUpdateArgs {
-  where: AssigneeUserWhereUniqueInput!
-  data: AssigneeUserUpdateInput!
-}
-
-input AssigneeUserCreateInput {
-  project: ProjectRelateToOneForCreateInput
-  user: UserRelateToOneForCreateInput
-  role: AssigneeUserRoleType
-}
-
-input ProjectRelateToOneForCreateInput {
-  create: ProjectCreateInput
-  connect: ProjectWhereUniqueInput
-}
-
-input UserRelateToOneForCreateInput {
-  create: UserCreateInput
-  connect: UserWhereUniqueInput
-}
-
-type Project {
-  id: ID!
-  title: String
-  description: String
-  tasks(where: TaskWhereInput! = {}, orderBy: [TaskOrderByInput!]! = [], take: Int, skip: Int! = 0): [Task!]
-  tasksCount(where: TaskWhereInput! = {}): Int
-}
-
-input ProjectWhereUniqueInput {
-  id: ID
-}
-
-input ProjectWhereInput {
-  AND: [ProjectWhereInput!]
-  OR: [ProjectWhereInput!]
-  NOT: [ProjectWhereInput!]
-  id: IDFilter
-  title: StringFilter
-  description: StringFilter
-  tasks: TaskManyRelationFilter
-}
-
-input ProjectOrderByInput {
-  id: OrderDirection
-  title: OrderDirection
-  description: OrderDirection
-}
-
-input ProjectUpdateInput {
-  title: String
-  description: String
-  tasks: TaskRelateToManyForUpdateInput
-}
-
-input ProjectUpdateArgs {
-  where: ProjectWhereUniqueInput!
-  data: ProjectUpdateInput!
-}
-
-input ProjectCreateInput {
-  title: String
-  description: String
-  tasks: TaskRelateToManyForCreateInput
-}
-
-type Task {
-  id: ID!
-  project: Project
-  createdBy: User
-  assignedUser: User
-  dueDate: DateTime
-  estimatedTime: Int
-  priority: TaskPriorityType
   name: String
   description: String
-  status: TaskStatusType
-  parentTask: Task
+  modelFile: FileFieldOutput
+  modelImage: ImageFieldOutput
+  createdAt: DateTime
+  createdBy: User
+}
+
+type FileFieldOutput {
+  filename: String!
+  filesize: Int!
+  url: String!
+}
+
+type ImageFieldOutput {
+  id: ID!
+  filesize: Int!
+  width: Int!
+  height: Int!
+  extension: ImageExtension!
+  url: String!
+}
+
+enum ImageExtension {
+  jpg
+  png
+  webp
+  gif
 }
 
 scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
 
-enum TaskPriorityType {
-  high
-  medium
-  low
-}
-
-enum TaskStatusType {
-  backlog
-  in_development
-  in_testing
-  in_approval
-  done
-}
-
-input TaskWhereUniqueInput {
+input ModelWhereUniqueInput {
   id: ID
 }
 
-input TaskWhereInput {
-  AND: [TaskWhereInput!]
-  OR: [TaskWhereInput!]
-  NOT: [TaskWhereInput!]
+input ModelWhereInput {
+  AND: [ModelWhereInput!]
+  OR: [ModelWhereInput!]
+  NOT: [ModelWhereInput!]
   id: IDFilter
-  project: ProjectWhereInput
-  createdBy: UserWhereInput
-  assignedUser: UserWhereInput
-  dueDate: DateTimeNullableFilter
-  estimatedTime: IntNullableFilter
-  priority: TaskPriorityTypeNullableFilter
   name: StringFilter
   description: StringFilter
-  status: TaskStatusTypeNullableFilter
-  parentTask: TaskWhereInput
+  createdAt: DateTimeNullableFilter
+  createdBy: UserWhereInput
 }
 
 input DateTimeNullableFilter {
@@ -317,81 +187,56 @@ input DateTimeNullableFilter {
   not: DateTimeNullableFilter
 }
 
-input IntNullableFilter {
-  equals: Int
-  in: [Int!]
-  notIn: [Int!]
-  lt: Int
-  lte: Int
-  gt: Int
-  gte: Int
-  not: IntNullableFilter
-}
-
-input TaskPriorityTypeNullableFilter {
-  equals: TaskPriorityType
-  in: [TaskPriorityType!]
-  notIn: [TaskPriorityType!]
-  not: TaskPriorityTypeNullableFilter
-}
-
-input TaskStatusTypeNullableFilter {
-  equals: TaskStatusType
-  in: [TaskStatusType!]
-  notIn: [TaskStatusType!]
-  not: TaskStatusTypeNullableFilter
-}
-
-input TaskOrderByInput {
+input ModelOrderByInput {
   id: OrderDirection
-  dueDate: OrderDirection
-  estimatedTime: OrderDirection
-  priority: OrderDirection
   name: OrderDirection
   description: OrderDirection
-  status: OrderDirection
+  createdAt: OrderDirection
 }
 
-input TaskUpdateInput {
-  project: ProjectRelateToOneForUpdateInput
-  createdBy: UserRelateToOneForUpdateInput
-  assignedUser: UserRelateToOneForUpdateInput
-  dueDate: DateTime
-  estimatedTime: Int
-  priority: TaskPriorityType
+input ModelUpdateInput {
   name: String
   description: String
-  status: TaskStatusType
-  parentTask: TaskRelateToOneForUpdateInput
+  modelFile: FileFieldInput
+  modelImage: ImageFieldInput
+  createdAt: DateTime
+  createdBy: UserRelateToOneForUpdateInput
 }
 
-input TaskRelateToOneForUpdateInput {
-  create: TaskCreateInput
-  connect: TaskWhereUniqueInput
+input FileFieldInput {
+  upload: Upload!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input ImageFieldInput {
+  upload: Upload!
+}
+
+input UserRelateToOneForUpdateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
   disconnect: Boolean
 }
 
-input TaskUpdateArgs {
-  where: TaskWhereUniqueInput!
-  data: TaskUpdateInput!
+input ModelUpdateArgs {
+  where: ModelWhereUniqueInput!
+  data: ModelUpdateInput!
 }
 
-input TaskCreateInput {
-  project: ProjectRelateToOneForCreateInput
-  createdBy: UserRelateToOneForCreateInput
-  assignedUser: UserRelateToOneForCreateInput
-  dueDate: DateTime
-  estimatedTime: Int
-  priority: TaskPriorityType
+input ModelCreateInput {
   name: String
   description: String
-  status: TaskStatusType
-  parentTask: TaskRelateToOneForCreateInput
+  modelFile: FileFieldInput
+  modelImage: ImageFieldInput
+  createdAt: DateTime
+  createdBy: UserRelateToOneForCreateInput
 }
 
-input TaskRelateToOneForCreateInput {
-  create: TaskCreateInput
-  connect: TaskWhereUniqueInput
+input UserRelateToOneForCreateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
 }
 
 """
@@ -406,24 +251,12 @@ type Mutation {
   updateUsers(data: [UserUpdateArgs!]!): [User]
   deleteUser(where: UserWhereUniqueInput!): User
   deleteUsers(where: [UserWhereUniqueInput!]!): [User]
-  createAssigneeUser(data: AssigneeUserCreateInput!): AssigneeUser
-  createAssigneeUsers(data: [AssigneeUserCreateInput!]!): [AssigneeUser]
-  updateAssigneeUser(where: AssigneeUserWhereUniqueInput!, data: AssigneeUserUpdateInput!): AssigneeUser
-  updateAssigneeUsers(data: [AssigneeUserUpdateArgs!]!): [AssigneeUser]
-  deleteAssigneeUser(where: AssigneeUserWhereUniqueInput!): AssigneeUser
-  deleteAssigneeUsers(where: [AssigneeUserWhereUniqueInput!]!): [AssigneeUser]
-  createProject(data: ProjectCreateInput!): Project
-  createProjects(data: [ProjectCreateInput!]!): [Project]
-  updateProject(where: ProjectWhereUniqueInput!, data: ProjectUpdateInput!): Project
-  updateProjects(data: [ProjectUpdateArgs!]!): [Project]
-  deleteProject(where: ProjectWhereUniqueInput!): Project
-  deleteProjects(where: [ProjectWhereUniqueInput!]!): [Project]
-  createTask(data: TaskCreateInput!): Task
-  createTasks(data: [TaskCreateInput!]!): [Task]
-  updateTask(where: TaskWhereUniqueInput!, data: TaskUpdateInput!): Task
-  updateTasks(data: [TaskUpdateArgs!]!): [Task]
-  deleteTask(where: TaskWhereUniqueInput!): Task
-  deleteTasks(where: [TaskWhereUniqueInput!]!): [Task]
+  createModel(data: ModelCreateInput!): Model
+  createModels(data: [ModelCreateInput!]!): [Model]
+  updateModel(where: ModelWhereUniqueInput!, data: ModelUpdateInput!): Model
+  updateModels(data: [ModelUpdateArgs!]!): [Model]
+  deleteModel(where: ModelWhereUniqueInput!): Model
+  deleteModels(where: [ModelWhereUniqueInput!]!): [Model]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -441,24 +274,18 @@ type UserAuthenticationWithPasswordFailure {
 }
 
 input CreateInitialUserInput {
-  name: String
   email: String
   password: String
+  username: String
 }
 
 type Query {
   users(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0): [User!]
   user(where: UserWhereUniqueInput!): User
   usersCount(where: UserWhereInput! = {}): Int
-  assigneeUsers(where: AssigneeUserWhereInput! = {}, orderBy: [AssigneeUserOrderByInput!]! = [], take: Int, skip: Int! = 0): [AssigneeUser!]
-  assigneeUser(where: AssigneeUserWhereUniqueInput!): AssigneeUser
-  assigneeUsersCount(where: AssigneeUserWhereInput! = {}): Int
-  projects(where: ProjectWhereInput! = {}, orderBy: [ProjectOrderByInput!]! = [], take: Int, skip: Int! = 0): [Project!]
-  project(where: ProjectWhereUniqueInput!): Project
-  projectsCount(where: ProjectWhereInput! = {}): Int
-  tasks(where: TaskWhereInput! = {}, orderBy: [TaskOrderByInput!]! = [], take: Int, skip: Int! = 0): [Task!]
-  task(where: TaskWhereUniqueInput!): Task
-  tasksCount(where: TaskWhereInput! = {}): Int
+  models(where: ModelWhereInput! = {}, orderBy: [ModelOrderByInput!]! = [], take: Int, skip: Int! = 0): [Model!]
+  model(where: ModelWhereUniqueInput!): Model
+  modelsCount(where: ModelWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

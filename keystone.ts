@@ -21,7 +21,7 @@ export default withAuth(
     storage: {
       model_files: {
         kind: 's3',
-        type: 'image',
+        type: 'file',
         bucketName: S3_BUCKET_NAME,
         region: S3_REGION,
         accessKeyId: S3_ACCESS_KEY_ID,

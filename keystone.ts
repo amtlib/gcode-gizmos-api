@@ -2,23 +2,16 @@ import { config } from '@keystone-6/core';
 import dotenv from 'dotenv';
 import { lists } from './schema';
 import { withAuth, session } from './auth';
+import { DATABASE_URL, S3_ACCESS_KEY_ID, S3_BUCKET_NAME, S3_REGION, S3_SECRET_ACCESS_KEY } from './config';
 
 dotenv.config();
-
-const {
-  S3_BUCKET_NAME: bucketName = '',
-  S3_REGION: region = '',
-  S3_ACCESS_KEY_ID: accessKeyId = '',
-  S3_SECRET_ACCESS_KEY: secretAccessKey = '',
-  DATABASE_URL: databaseUrl = '',
-} = process.env;
 
 export default withAuth(
   config({
     db: {
       provider: 'postgresql',
       useMigrations: true,
-      url: databaseUrl,
+      url: DATABASE_URL
     },
     lists,
     session,
@@ -29,19 +22,19 @@ export default withAuth(
       model_files: {
         kind: 's3',
         type: 'image',
-        bucketName,
-        region,
-        accessKeyId,
-        secretAccessKey,
+        bucketName: S3_BUCKET_NAME,
+        region: S3_REGION,
+        accessKeyId: S3_ACCESS_KEY_ID,
+        secretAccessKey: S3_SECRET_ACCESS_KEY,
         signed: { expiry: 5000 },
       },
       model_images: {
         kind: 's3',
         type: 'image',
-        bucketName,
-        region,
-        accessKeyId,
-        secretAccessKey,
+        bucketName: S3_BUCKET_NAME,
+        region: S3_REGION,
+        accessKeyId: S3_ACCESS_KEY_ID,
+        secretAccessKey: S3_SECRET_ACCESS_KEY,
         signed: { expiry: 5000 },
       }
     }

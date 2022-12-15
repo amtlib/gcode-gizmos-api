@@ -10,13 +10,15 @@ const {
   S3_REGION: region = '',
   S3_ACCESS_KEY_ID: accessKeyId = '',
   S3_SECRET_ACCESS_KEY: secretAccessKey = '',
+  DATABASE_URL: databaseUrl = '',
 } = process.env;
 
 export default withAuth(
   config({
     db: {
-      provider: 'sqlite',
-      url: 'file:./keystone.db',
+      provider: 'postgresql',
+      useMigrations: true,
+      url: databaseUrl,
     },
     lists,
     session,

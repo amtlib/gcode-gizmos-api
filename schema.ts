@@ -47,7 +47,7 @@ export const lists: Lists = {
           return await isAdmin(session.data.email, context);
         }
       }
-    },
+    }
   }),
   Model: list({
     fields: {
@@ -58,7 +58,9 @@ export const lists: Lists = {
       modelFile: file({ storage: 'model_files' }),
       modelImage: image({ storage: 'model_images'}),
       createdAt: timestamp({ defaultValue: { kind: 'now' }}),
-      createdBy: relationship({ ref: 'User.createdModels' }),
+      createdBy: relationship({ ref: 'User.createdModels', ui: {
+        labelField: 'username'
+      } }),
     },
     access: {
       operation: {

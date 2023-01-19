@@ -37,6 +37,12 @@ export default withAuth(
         secretAccessKey: S3_SECRET_ACCESS_KEY,
         signed: { expiry: 5000 },
       }
+    },
+    graphql: {
+      playground: true,
+      apolloConfig: {
+        introspection: true
+      }
     }
   })
 );

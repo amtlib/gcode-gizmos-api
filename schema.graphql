@@ -9,6 +9,8 @@ type User {
   username: String
   createdModels(where: ModelWhereInput! = {}, orderBy: [ModelOrderByInput!]! = [], take: Int, skip: Int! = 0): [Model!]
   createdModelsCount(where: ModelWhereInput! = {}): Int
+  likedModels(where: ModelWhereInput! = {}, orderBy: [ModelOrderByInput!]! = [], take: Int, skip: Int! = 0): [Model!]
+  likedModelsCount(where: ModelWhereInput! = {}): Int
 }
 
 type PasswordState {
@@ -30,6 +32,7 @@ input UserWhereInput {
   isAdmin: BooleanFilter
   username: StringFilter
   createdModels: ModelManyRelationFilter
+  likedModels: ModelManyRelationFilter
 }
 
 input IDFilter {
@@ -106,6 +109,7 @@ input UserUpdateInput {
   password: String
   username: String
   createdModels: ModelRelateToManyForUpdateInput
+  likedModels: ModelRelateToManyForUpdateInput
 }
 
 input ModelRelateToManyForUpdateInput {
@@ -126,6 +130,7 @@ input UserCreateInput {
   password: String
   username: String
   createdModels: ModelRelateToManyForCreateInput
+  likedModels: ModelRelateToManyForCreateInput
 }
 
 input ModelRelateToManyForCreateInput {
@@ -141,6 +146,10 @@ type Model {
   modelImage: ImageFieldOutput
   createdAt: DateTime
   createdBy: User
+  likedBy(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0): [User!]
+  likedByCount(where: UserWhereInput! = {}): Int
+  doUserLikesIt: Boolean
+  slug: String
 }
 
 type FileFieldOutput {
@@ -169,6 +178,7 @@ scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339
 
 input ModelWhereUniqueInput {
   id: ID
+  slug: String
 }
 
 input ModelWhereInput {
@@ -180,6 +190,8 @@ input ModelWhereInput {
   description: StringFilter
   createdAt: DateTimeNullableFilter
   createdBy: UserWhereInput
+  likedBy: UserManyRelationFilter
+  slug: StringFilter
 }
 
 input DateTimeNullableFilter {
@@ -193,11 +205,18 @@ input DateTimeNullableFilter {
   not: DateTimeNullableFilter
 }
 
+input UserManyRelationFilter {
+  every: UserWhereInput
+  some: UserWhereInput
+  none: UserWhereInput
+}
+
 input ModelOrderByInput {
   id: OrderDirection
   name: OrderDirection
   description: OrderDirection
   createdAt: OrderDirection
+  slug: OrderDirection
 }
 
 input ModelUpdateInput {
@@ -207,6 +226,8 @@ input ModelUpdateInput {
   modelImage: ImageFieldInput
   createdAt: DateTime
   createdBy: UserRelateToOneForUpdateInput
+  likedBy: UserRelateToManyForUpdateInput
+  slug: String
 }
 
 input FileFieldInput {
@@ -226,6 +247,13 @@ input UserRelateToOneForUpdateInput {
   disconnect: Boolean
 }
 
+input UserRelateToManyForUpdateInput {
+  disconnect: [UserWhereUniqueInput!]
+  set: [UserWhereUniqueInput!]
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
+}
+
 input ModelUpdateArgs {
   where: ModelWhereUniqueInput!
   data: ModelUpdateInput!
@@ -238,11 +266,18 @@ input ModelCreateInput {
   modelImage: ImageFieldInput
   createdAt: DateTime
   createdBy: UserRelateToOneForCreateInput
+  likedBy: UserRelateToManyForCreateInput
+  slug: String
 }
 
 input UserRelateToOneForCreateInput {
   create: UserCreateInput
   connect: UserWhereUniqueInput
+}
+
+input UserRelateToManyForCreateInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
 }
 
 """

@@ -19,6 +19,7 @@ model User {
   password      String
   username      String  @unique @default("")
   createdModels Model[] @relation("Model_createdBy")
+  likedModels   Model[] @relation("Model_likedBy")
 }
 
 model Model {
@@ -35,6 +36,8 @@ model Model {
   createdAt            DateTime? @default(now())
   createdBy            User?     @relation("Model_createdBy", fields: [createdById], references: [id])
   createdById          String?   @map("createdBy")
+  likedBy              User[]    @relation("Model_likedBy")
+  slug                 String    @unique @default("")
 
   @@index([createdById])
 }

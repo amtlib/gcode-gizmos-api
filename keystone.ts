@@ -16,7 +16,7 @@ export default withAuth(
     lists,
     session,
     server: {
-      cors: { origin: "http://localhost:5000", credentials: true }
+      cors: { origin: "*", credentials: true }
     },
     storage: {
       model_files: {

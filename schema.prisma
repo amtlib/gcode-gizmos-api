@@ -38,6 +38,9 @@ model Model {
   createdById          String?   @map("createdBy")
   likedBy              User[]    @relation("Model_likedBy")
   slug                 String    @unique @default("")
+  recommendedInfill    Decimal?  @postgresql.Decimal(18, 4)
+  recommendedMaterial  String?
+  supports             String?
 
   @@index([createdById])
 }

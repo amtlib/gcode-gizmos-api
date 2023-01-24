@@ -12,6 +12,8 @@ import {
     image,
     timestamp,
     virtual,
+    decimal,
+    select,
 } from '@keystone-6/core/fields';
 
 import type { Lists } from '.keystone/types';
@@ -107,11 +109,24 @@ export const lists: Lists = {
                     },
                 },
             }),
+            recommendedInfill: decimal({validation: {min: "0", max: "100"}}),
+            recommendedMaterial: select({ options: [
+                {label: "PLA", value: "pla"},
+                {label: "ABS", value: "abs"},
+                {label: "PET", value: "pet"},
+                {label: "TPE", value: "tpe"},
+            ]}),
+            supports: select({ options: [
+                { label: "Yes", value: "yes"},
+                { label: "No", value: "no"},
+                { label: "Doesn't matter", value: "n/a"},
+            ]}),
         },
         access: {
             operation: {
                 create: async ({ session, context, listKey, operation }) => {
-                    return await isLoggedIn(session.data.email, context);
+                    // return await isLoggedIn(session.data.email, context);
+                    return true
                 },
                 query: allowAll,
                 update: async ({ session, context, listKey, operation }) => {

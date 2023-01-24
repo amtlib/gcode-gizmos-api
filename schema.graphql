@@ -150,6 +150,9 @@ type Model {
   likedByCount(where: UserWhereInput! = {}): Int
   doUserLikesIt: Boolean
   slug: String
+  recommendedInfill: Decimal
+  recommendedMaterial: String
+  supports: String
 }
 
 type FileFieldOutput {
@@ -176,6 +179,8 @@ enum ImageExtension {
 
 scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
 
+scalar Decimal
+
 input ModelWhereUniqueInput {
   id: ID
   slug: String
@@ -192,6 +197,9 @@ input ModelWhereInput {
   createdBy: UserWhereInput
   likedBy: UserManyRelationFilter
   slug: StringFilter
+  recommendedInfill: DecimalNullableFilter
+  recommendedMaterial: StringNullableFilter
+  supports: StringNullableFilter
 }
 
 input DateTimeNullableFilter {
@@ -211,12 +219,55 @@ input UserManyRelationFilter {
   none: UserWhereInput
 }
 
+input DecimalNullableFilter {
+  equals: Decimal
+  in: [Decimal!]
+  notIn: [Decimal!]
+  lt: Decimal
+  lte: Decimal
+  gt: Decimal
+  gte: Decimal
+  not: DecimalNullableFilter
+}
+
+input StringNullableFilter {
+  equals: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  mode: QueryMode
+  not: NestedStringNullableFilter
+}
+
+input NestedStringNullableFilter {
+  equals: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  not: NestedStringNullableFilter
+}
+
 input ModelOrderByInput {
   id: OrderDirection
   name: OrderDirection
   description: OrderDirection
   createdAt: OrderDirection
   slug: OrderDirection
+  recommendedInfill: OrderDirection
+  recommendedMaterial: OrderDirection
+  supports: OrderDirection
 }
 
 input ModelUpdateInput {
@@ -228,6 +279,9 @@ input ModelUpdateInput {
   createdBy: UserRelateToOneForUpdateInput
   likedBy: UserRelateToManyForUpdateInput
   slug: String
+  recommendedInfill: Decimal
+  recommendedMaterial: String
+  supports: String
 }
 
 input FileFieldInput {
@@ -268,6 +322,9 @@ input ModelCreateInput {
   createdBy: UserRelateToOneForCreateInput
   likedBy: UserRelateToManyForCreateInput
   slug: String
+  recommendedInfill: Decimal
+  recommendedMaterial: String
+  supports: String
 }
 
 input UserRelateToOneForCreateInput {
@@ -299,7 +356,7 @@ type Mutation {
   deleteModel(where: ModelWhereUniqueInput!): Model
   deleteModels(where: [ModelWhereUniqueInput!]!): [Model]
   endSession: Boolean!
-  authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
+  authenticateUserWithPassword(username: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
 }
 

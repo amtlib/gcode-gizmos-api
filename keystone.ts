@@ -16,7 +16,7 @@ export default withAuth(
     lists,
     session,
     server: {
-      cors: { origin: "*", credentials: true }
+      cors: { origin: ["http://localhost:5000", "https://gcode-gizmos-frontend-production.up.railway.app/"], credentials: true }
     },
     storage: {
       model_files: {

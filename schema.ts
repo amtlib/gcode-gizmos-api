@@ -1,7 +1,7 @@
 import { graphql, list } from '@keystone-6/core';
 import { allowAll } from '@keystone-6/core/access';
 import slugify from 'slugify';
-import { isAdmin, isLoggedIn } from "./helpers";
+import { isAdmin } from "./helpers";
 
 import {
     text,
@@ -46,13 +46,28 @@ export const lists: Lists = {
         },
         access: {
             operation: {
-                create: allowAll,
                 query: allowAll,
-                update: async ({ session, context, listKey, operation }) => {
-                    return await isAdmin(session.data.email, context);
+                update: allowAll,
+                delete: allowAll,
+                create: allowAll
+            },
+            item: {
+                create: allowAll,
+                update: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.username === username || await isAdmin(username, context));
+                    return canEdit;
                 },
-                delete: async ({ session, context, listKey, operation }) => {
-                    return await isAdmin(session.data.email, context);
+                delete: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.username === username || await isAdmin(username, context));
+                    return canEdit;
                 }
             }
         }
@@ -124,17 +139,47 @@ export const lists: Lists = {
         },
         access: {
             operation: {
-                create: async ({ session, context, listKey, operation }) => {
-                    // return await isLoggedIn(session.data.email, context);
-                    return true
-                },
                 query: allowAll,
-                update: async ({ session, context, listKey, operation }) => {
-                    return await isLoggedIn(session.data.email, context);
+                update: allowAll,
+                delete: allowAll,
+                create: allowAll
+            },
+            item: {
+                create: async ({ session }) => {
+                    const username = session?.data.username as string;
+                    if (!username) {
+                        return false;
+                    }
+                    return true;
                 },
-                delete: async ({ session, context, listKey, operation }) => {
-                    return await isLoggedIn(session.data.email, context);
+                update: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    return canEdit;
                 },
+                delete: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    return canEdit;
+                }
             }
         }
     })

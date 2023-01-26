@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import { lists } from './schema';
 import { withAuth, session } from './auth';
 import { DATABASE_URL, S3_ACCESS_KEY_ID, S3_BUCKET_NAME, S3_REGION, S3_SECRET_ACCESS_KEY } from './config';
+import { KeystoneConfig, BaseKeystoneTypeInfo } from '@keystone-6/core/types';
+import { isAdmin } from './helpers';
 
 dotenv.config();
 
@@ -12,6 +14,14 @@ export default withAuth(
       provider: 'postgresql',
       useMigrations: true,
       url: DATABASE_URL
+    },
+    ui: {
+      isAccessAllowed: (context) => {
+        if (context.session) {
+          return isAdmin(context?.session?.data?.username, context)
+        }
+        return false;
+      }
     },
     lists,
     session,

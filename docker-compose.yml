@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  keystone:
+    build: .
+    ports:
+      - 3500:3000
+    depends_on:
+      - db
+    environment:
+    #   - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/gcodegizmos
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=gcodegizmos
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+volumes:
+  db-data:

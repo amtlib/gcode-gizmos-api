@@ -19,6 +19,118 @@ import {
 import type { Lists } from '.keystone/types';
 
 export const lists: Lists = {
+    ModelImage: list({
+        fields: {
+            model: relationship({ ref: 'Model.images' }),
+            image: image({ storage: 'model_images' }),
+            createdBy: relationship({
+                ref: 'User.createdImages', ui: {
+                    labelField: 'username'
+                }
+            }),
+        },
+        access: {
+            operation: {
+                query: allowAll,
+                update: allowAll,
+                delete: allowAll,
+                create: allowAll
+            },
+            item: {
+                create: async ({ session }) => {
+                    const username = session?.data.username as string;
+                    if (!username) {
+                        return false;
+                    }
+                    return true;
+                },
+                update: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    return canEdit;
+                },
+                delete: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    return canEdit;
+                }
+            }
+        }
+    }),
+    ModelFile: list({
+        fields: {
+            model: relationship({ ref: 'Model.files' }),
+            file: file({ storage: 'model_files' }),
+            createdBy: relationship({
+                ref: 'User.createdFiles', ui: {
+                    labelField: 'username'
+                }
+            }),
+        },
+        access: {
+            operation: {
+                query: allowAll,
+                update: allowAll,
+                delete: allowAll,
+                create: allowAll
+            },
+            item: {
+                create: async ({ session }) => {
+                    const username = session?.data.username as string;
+                    if (!username) {
+                        return false;
+                    }
+                    return true;
+                },
+                update: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    return canEdit;
+                },
+                delete: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    return canEdit;
+                }
+            }
+        }
+    }),
     User: list({
         ui: {
             labelField: 'username'
@@ -42,7 +154,9 @@ export const lists: Lists = {
                 isIndexed: "unique"
             }),
             createdModels: relationship({ ref: 'Model.createdBy', many: true }),
-            likedModels: relationship({ ref: 'Model.likedBy', many: true })
+            likedModels: relationship({ ref: 'Model.likedBy', many: true }),
+            createdImages: relationship({ ref: 'ModelImage.createdBy', many: true }),
+            createdFiles: relationship({ ref: 'ModelFile.createdBy', many: true })
         },
         access: {
             operation: {
@@ -78,21 +192,23 @@ export const lists: Lists = {
                 validation: { isRequired: true },
             }),
             description: text({ validation: { isRequired: false } }),
-            modelFile: file({ storage: 'model_files' }),
-            modelImage: image({ storage: 'model_images' }),
+            images: relationship({ ref: "ModelImage.model", many: true }),
+            files: relationship({ ref: "ModelFile.model", many: true }),
             createdAt: timestamp({ defaultValue: { kind: 'now' } }),
             createdBy: relationship({
                 ref: 'User.createdModels', ui: {
                     labelField: 'username'
                 }
             }),
-            likedBy: relationship({ ref: 'User.likedModels', many: true, ui: {
-                labelField: "username",
-            } }),
+            likedBy: relationship({
+                ref: 'User.likedModels', many: true, ui: {
+                    labelField: "username",
+                }
+            }),
             doUserLikesIt: virtual({
                 ui: {
-                    itemView: {fieldMode: 'hidden'},
-                    listView:  {fieldMode: 'hidden'}
+                    itemView: { fieldMode: 'hidden' },
+                    listView: { fieldMode: 'hidden' }
                 },
                 field: graphql.field({
                     type: graphql.Boolean,
@@ -124,18 +240,33 @@ export const lists: Lists = {
                     },
                 },
             }),
-            recommendedInfill: decimal({validation: {min: "0", max: "100"}}),
-            recommendedMaterial: select({ options: [
-                {label: "PLA", value: "pla"},
-                {label: "ABS", value: "abs"},
-                {label: "PET", value: "pet"},
-                {label: "TPE", value: "tpe"},
-            ]}),
-            supports: select({ options: [
-                { label: "Yes", value: "yes"},
-                { label: "No", value: "no"},
-                { label: "Doesn't matter", value: "n/a"},
-            ]}),
+            recommendedInfill: decimal({ validation: { min: "0", max: "100" } }),
+            recommendedMaterial: select({
+                options: [
+                    { label: "PLA", value: "pla" },
+                    { label: "ABS", value: "abs" },
+                    { label: "PET", value: "pet" },
+                    { label: "TPE", value: "tpe" },
+                ]
+            }),
+            supports: select({
+                options: [
+                    { label: "Yes", value: "yes" },
+                    { label: "No", value: "no" },
+                    { label: "Doesn't matter", value: "n/a" },
+                ]
+            }),
+        },
+        hooks: {
+            afterOperation: async ({ operation, item, context }) => {
+                if (operation === "update" || operation === "delete") {
+                    // delete files when no model is attached
+                    const lonelyImages = await context.query.ModelImage.findMany({ where: { model: null } });
+                    const lonelyFiles = await context.query.ModelFile.findMany({ where: { model: null } });
+                    context.query.ModelImage.deleteMany({ where: [...lonelyImages.map(image => ({ id: image.id }))] });
+                    context.query.ModelFile.deleteMany({ where: [...lonelyFiles.map(file => ({ id: file.id }))] });
+                }
+            }
         },
         access: {
             operation: {

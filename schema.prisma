@@ -12,35 +12,61 @@ generator client {
   output   = "node_modules/.prisma/client"
 }
 
-model User {
+model ModelImage {
+  id              String  @id @default(cuid())
+  model           Model?  @relation("ModelImage_model", fields: [modelId], references: [id])
+  modelId         String? @map("model")
+  image_filesize  Int?
+  image_extension String?
+  image_width     Int?
+  image_height    Int?
+  image_id        String?
+  createdBy       User?   @relation("ModelImage_createdBy", fields: [createdById], references: [id])
+  createdById     String? @map("createdBy")
+
+  @@index([modelId])
+  @@index([createdById])
+}
+
+model ModelFile {
   id            String  @id @default(cuid())
-  email         String  @unique @default("")
-  isAdmin       Boolean @default(false)
+  model         Model?  @relation("ModelFile_model", fields: [modelId], references: [id])
+  modelId       String? @map("model")
+  file_filesize Int?
+  file_filename String?
+  createdBy     User?   @relation("ModelFile_createdBy", fields: [createdById], references: [id])
+  createdById   String? @map("createdBy")
+
+  @@index([modelId])
+  @@index([createdById])
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique @default("")
+  isAdmin       Boolean      @default(false)
   password      String
-  username      String  @unique @default("")
-  createdModels Model[] @relation("Model_createdBy")
-  likedModels   Model[] @relation("Model_likedBy")
+  username      String       @unique @default("")
+  createdModels Model[]      @relation("Model_createdBy")
+  likedModels   Model[]      @relation("Model_likedBy")
+  createdImages ModelImage[] @relation("ModelImage_createdBy")
+  createdFiles  ModelFile[]  @relation("ModelFile_createdBy")
 }
 
 model Model {
-  id                   String    @id @default(cuid())
-  name                 String    @default("")
-  description          String    @default("")
-  modelFile_filesize   Int?
-  modelFile_filename   String?
-  modelImage_filesize  Int?
-  modelImage_extension String?
-  modelImage_width     Int?
-  modelImage_height    Int?
-  modelImage_id        String?
-  createdAt            DateTime? @default(now())
-  createdBy            User?     @relation("Model_createdBy", fields: [createdById], references: [id])
-  createdById          String?   @map("createdBy")
-  likedBy              User[]    @relation("Model_likedBy")
-  slug                 String    @unique @default("")
-  recommendedInfill    Decimal?  @postgresql.Decimal(18, 4)
-  recommendedMaterial  String?
-  supports             String?
+  id                  String       @id @default(cuid())
+  name                String       @default("")
+  description         String       @default("")
+  images              ModelImage[] @relation("ModelImage_model")
+  files               ModelFile[]  @relation("ModelFile_model")
+  createdAt           DateTime?    @default(now())
+  createdBy           User?        @relation("Model_createdBy", fields: [createdById], references: [id])
+  createdById         String?      @map("createdBy")
+  likedBy             User[]       @relation("Model_likedBy")
+  slug                String       @unique @default("")
+  recommendedInfill   Decimal?     @postgresql.Decimal(18, 4)
+  recommendedMaterial String?
+  supports            String?
 
   @@index([createdById])
 }

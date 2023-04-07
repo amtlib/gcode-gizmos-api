@@ -3,10 +3,11 @@
   "version": "1.0.2",
   "private": true,
   "scripts": {
-    "dev": "keystone dev",
+    "dev": "keystone dev -p 3000",
     "start": "keystone start",
     "build": "keystone build",
-    "postinstall": "keystone postinstall"
+    "postinstall": "keystone postinstall",
+    "gen:migration": "keystone prisma migrate dev --create-only"
   },
   "dependencies": {
     "@keystone-6/auth": "^5.0.0",

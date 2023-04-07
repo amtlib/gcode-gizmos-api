@@ -32,6 +32,7 @@ export default withAuth(
       model_files: {
         kind: 's3',
         type: 'file',
+        pathPrefix: 'files/',
         bucketName: S3_BUCKET_NAME,
         region: S3_REGION,
         accessKeyId: S3_ACCESS_KEY_ID,
@@ -41,6 +42,7 @@ export default withAuth(
       model_images: {
         kind: 's3',
         type: 'image',
+        pathPrefix: 'images/',
         bucketName: S3_BUCKET_NAME,
         region: S3_REGION,
         accessKeyId: S3_ACCESS_KEY_ID,

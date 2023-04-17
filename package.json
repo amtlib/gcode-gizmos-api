@@ -7,6 +7,7 @@
     "start": "keystone start",
     "build": "keystone build",
     "postinstall": "keystone postinstall",
+    "migrate:deploy": "keystone prisma migrate deploy",
     "gen:migration": "keystone prisma migrate dev --create-only"
   },
   "dependencies": {

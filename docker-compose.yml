@@ -3,25 +3,23 @@ version: '3'
 services:
   keystone:
     build: .
-    ports:
-      - 3500:3000
     depends_on:
       - db
-    environment:
-    #   - NODE_ENV=production
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/gcodegizmos
     env_file:
       - .env
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gcode-gizmos-frontend.rule=Host(`admin.gcode-gizmos.${PRIMARY_DOMAIN}`)"
+      - "traefik.http.routers.gcode-gizmos-frontend.entrypoints=websecure"
+      - "traefik.http.routers.gcode-gizmos-frontend.tls.certresolver=le"
   db:
     image: postgres
     restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=gcodegizmos
+    env_file:
+      - .env
     ports:
       - 5432:5432
     volumes:

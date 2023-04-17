@@ -3,18 +3,18 @@ version: '3'
 services:
   keystone:
     build: .
+    restart: always
     depends_on:
       - db
     env_file:
       - .env
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gcode-gizmos-frontend.rule=Host(`admin.gcode-gizmos.${PRIMARY_DOMAIN}`)"
-      - "traefik.http.routers.gcode-gizmos-frontend.entrypoints=websecure"
-      - "traefik.http.routers.gcode-gizmos-frontend.tls.certresolver=le"
+      - "traefik.http.routers.keystone.rule=Host(`admin.gcode-gizmos.${PRIMARY_DOMAIN}`)"
+      - "traefik.http.routers.keystone.entrypoints=websecure"
+      - "traefik.http.routers.keystone.tls.certresolver=le"
+    networks:
+      - root_traefik-public
   db:
     image: postgres
     restart: always
@@ -24,5 +24,10 @@ services:
       - 5432:5432
     volumes:
       - db-data:/var/lib/postgresql/data
+    networks:
+      - root_traefik-public
 volumes:
   db-data:
+networks:
+  root_traefik-public:
+    external: true

@@ -70,7 +70,7 @@ model Comment {
 model Model {
   id                  String       @id @default(cuid())
   name                String       @default("")
-  description         String       @default("")
+  description         Json         @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   images              ModelImage[] @relation("ModelImage_model")
   files               ModelFile[]  @relation("ModelFile_model")
   createdAt           DateTime?    @default(now())

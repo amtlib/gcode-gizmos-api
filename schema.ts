@@ -201,7 +201,7 @@ export const lists: Lists = {
                   [1, 1],
                   [1, 1, 1],
                 ],
-              }),
+            }),
         },
         access: {
             operation: {
@@ -254,7 +254,15 @@ export const lists: Lists = {
             name: text({
                 validation: { isRequired: true },
             }),
-            description: text({ validation: { isRequired: false } }),
+            description: document({
+                formatting: true,
+                dividers: true,
+                links: true,
+                layouts: [
+                  [1, 1],
+                  [1, 1, 1],
+                ],
+            }),
             images: relationship({ ref: "ModelImage.model", many: true }),
             files: relationship({ ref: "ModelFile.model", many: true }),
             createdAt: timestamp({ defaultValue: { kind: 'now' } }),

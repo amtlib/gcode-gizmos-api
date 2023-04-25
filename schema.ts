@@ -192,6 +192,7 @@ export const lists: Lists = {
         fields: {
             model: relationship({ ref: "Model.comments" }),
             author: relationship({ ref: "User.comments" }),
+            createdAt: timestamp({ defaultValue: { kind: 'now' } }),
             content: document({
                 formatting: true,
                 dividers: true,

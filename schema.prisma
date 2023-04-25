@@ -55,12 +55,13 @@ model User {
 }
 
 model Comment {
-  id       String  @id @default(cuid())
-  model    Model?  @relation("Comment_model", fields: [modelId], references: [id])
-  modelId  String? @map("model")
-  author   User?   @relation("Comment_author", fields: [authorId], references: [id])
-  authorId String? @map("author")
-  content  Json    @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  id        String    @id @default(cuid())
+  model     Model?    @relation("Comment_model", fields: [modelId], references: [id])
+  modelId   String?   @map("model")
+  author    User?     @relation("Comment_author", fields: [authorId], references: [id])
+  authorId  String?   @map("author")
+  createdAt DateTime? @default(now())
+  content   Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
 
   @@index([modelId])
   @@index([authorId])

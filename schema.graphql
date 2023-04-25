@@ -348,8 +348,11 @@ type Comment {
   id: ID!
   model: Model
   author: User
+  createdAt: DateTime
   content: Comment_content_Document
 }
+
+scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
 
 type Comment_content_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
@@ -366,15 +369,29 @@ input CommentWhereInput {
   id: IDFilter
   model: ModelWhereInput
   author: UserWhereInput
+  createdAt: DateTimeNullableFilter
+}
+
+input DateTimeNullableFilter {
+  equals: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
+  not: DateTimeNullableFilter
 }
 
 input CommentOrderByInput {
   id: OrderDirection
+  createdAt: OrderDirection
 }
 
 input CommentUpdateInput {
   model: ModelRelateToOneForUpdateInput
   author: UserRelateToOneForUpdateInput
+  createdAt: DateTime
   content: JSON
 }
 
@@ -386,6 +403,7 @@ input CommentUpdateArgs {
 input CommentCreateInput {
   model: ModelRelateToOneForCreateInput
   author: UserRelateToOneForCreateInput
+  createdAt: DateTime
   content: JSON
 }
 
@@ -410,8 +428,6 @@ type Model {
   supports: String
 }
 
-scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
-
 input ModelWhereUniqueInput {
   id: ID
   slug: String
@@ -434,17 +450,6 @@ input ModelWhereInput {
   recommendedInfill: IntNullableFilter
   recommendedMaterial: StringNullableFilter
   supports: StringNullableFilter
-}
-
-input DateTimeNullableFilter {
-  equals: DateTime
-  in: [DateTime!]
-  notIn: [DateTime!]
-  lt: DateTime
-  lte: DateTime
-  gt: DateTime
-  gte: DateTime
-  not: DateTimeNullableFilter
 }
 
 input UserManyRelationFilter {

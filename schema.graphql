@@ -168,6 +168,8 @@ type User {
   createdImagesCount(where: ModelImageWhereInput! = {}): Int
   createdFiles(where: ModelFileWhereInput! = {}, orderBy: [ModelFileOrderByInput!]! = [], take: Int, skip: Int! = 0): [ModelFile!]
   createdFilesCount(where: ModelFileWhereInput! = {}): Int
+  comments(where: CommentWhereInput! = {}, orderBy: [CommentOrderByInput!]! = [], take: Int, skip: Int! = 0): [Comment!]
+  commentsCount(where: CommentWhereInput! = {}): Int
 }
 
 type PasswordState {
@@ -192,6 +194,7 @@ input UserWhereInput {
   likedModels: ModelManyRelationFilter
   createdImages: ModelImageManyRelationFilter
   createdFiles: ModelFileManyRelationFilter
+  comments: CommentManyRelationFilter
 }
 
 input StringFilter {
@@ -251,6 +254,12 @@ input ModelFileManyRelationFilter {
   none: ModelFileWhereInput
 }
 
+input CommentManyRelationFilter {
+  every: CommentWhereInput
+  some: CommentWhereInput
+  none: CommentWhereInput
+}
+
 input UserOrderByInput {
   id: OrderDirection
   email: OrderDirection
@@ -267,6 +276,7 @@ input UserUpdateInput {
   likedModels: ModelRelateToManyForUpdateInput
   createdImages: ModelImageRelateToManyForUpdateInput
   createdFiles: ModelFileRelateToManyForUpdateInput
+  comments: CommentRelateToManyForUpdateInput
 }
 
 input ModelRelateToManyForUpdateInput {
@@ -290,6 +300,13 @@ input ModelFileRelateToManyForUpdateInput {
   connect: [ModelFileWhereUniqueInput!]
 }
 
+input CommentRelateToManyForUpdateInput {
+  disconnect: [CommentWhereUniqueInput!]
+  set: [CommentWhereUniqueInput!]
+  create: [CommentCreateInput!]
+  connect: [CommentWhereUniqueInput!]
+}
+
 input UserUpdateArgs {
   where: UserWhereUniqueInput!
   data: UserUpdateInput!
@@ -304,6 +321,7 @@ input UserCreateInput {
   likedModels: ModelRelateToManyForCreateInput
   createdImages: ModelImageRelateToManyForCreateInput
   createdFiles: ModelFileRelateToManyForCreateInput
+  comments: CommentRelateToManyForCreateInput
 }
 
 input ModelRelateToManyForCreateInput {
@@ -321,6 +339,56 @@ input ModelFileRelateToManyForCreateInput {
   connect: [ModelFileWhereUniqueInput!]
 }
 
+input CommentRelateToManyForCreateInput {
+  create: [CommentCreateInput!]
+  connect: [CommentWhereUniqueInput!]
+}
+
+type Comment {
+  id: ID!
+  model: Model
+  author: User
+  content: Comment_content_Document
+}
+
+type Comment_content_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+input CommentWhereUniqueInput {
+  id: ID
+}
+
+input CommentWhereInput {
+  AND: [CommentWhereInput!]
+  OR: [CommentWhereInput!]
+  NOT: [CommentWhereInput!]
+  id: IDFilter
+  model: ModelWhereInput
+  author: UserWhereInput
+}
+
+input CommentOrderByInput {
+  id: OrderDirection
+}
+
+input CommentUpdateInput {
+  model: ModelRelateToOneForUpdateInput
+  author: UserRelateToOneForUpdateInput
+  content: JSON
+}
+
+input CommentUpdateArgs {
+  where: CommentWhereUniqueInput!
+  data: CommentUpdateInput!
+}
+
+input CommentCreateInput {
+  model: ModelRelateToOneForCreateInput
+  author: UserRelateToOneForCreateInput
+  content: JSON
+}
+
 type Model {
   id: ID!
   name: String
@@ -331,18 +399,18 @@ type Model {
   filesCount(where: ModelFileWhereInput! = {}): Int
   createdAt: DateTime
   createdBy: User
+  comments(where: CommentWhereInput! = {}, orderBy: [CommentOrderByInput!]! = [], take: Int, skip: Int! = 0): [Comment!]
+  commentsCount(where: CommentWhereInput! = {}): Int
   likedBy(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0): [User!]
   likedByCount(where: UserWhereInput! = {}): Int
   doUserLikesIt: Boolean
   slug: String
-  recommendedInfill: Decimal
+  recommendedInfill: Int
   recommendedMaterial: String
   supports: String
 }
 
 scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
-
-scalar Decimal
 
 input ModelWhereUniqueInput {
   id: ID
@@ -360,9 +428,10 @@ input ModelWhereInput {
   files: ModelFileManyRelationFilter
   createdAt: DateTimeNullableFilter
   createdBy: UserWhereInput
+  comments: CommentManyRelationFilter
   likedBy: UserManyRelationFilter
   slug: StringFilter
-  recommendedInfill: DecimalNullableFilter
+  recommendedInfill: IntNullableFilter
   recommendedMaterial: StringNullableFilter
   supports: StringNullableFilter
 }
@@ -384,15 +453,15 @@ input UserManyRelationFilter {
   none: UserWhereInput
 }
 
-input DecimalNullableFilter {
-  equals: Decimal
-  in: [Decimal!]
-  notIn: [Decimal!]
-  lt: Decimal
-  lte: Decimal
-  gt: Decimal
-  gte: Decimal
-  not: DecimalNullableFilter
+input IntNullableFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntNullableFilter
 }
 
 input StringNullableFilter {
@@ -442,9 +511,10 @@ input ModelUpdateInput {
   files: ModelFileRelateToManyForUpdateInput
   createdAt: DateTime
   createdBy: UserRelateToOneForUpdateInput
+  comments: CommentRelateToManyForUpdateInput
   likedBy: UserRelateToManyForUpdateInput
   slug: String
-  recommendedInfill: Decimal
+  recommendedInfill: Int
   recommendedMaterial: String
   supports: String
 }
@@ -468,9 +538,10 @@ input ModelCreateInput {
   files: ModelFileRelateToManyForCreateInput
   createdAt: DateTime
   createdBy: UserRelateToOneForCreateInput
+  comments: CommentRelateToManyForCreateInput
   likedBy: UserRelateToManyForCreateInput
   slug: String
-  recommendedInfill: Decimal
+  recommendedInfill: Int
   recommendedMaterial: String
   supports: String
 }
@@ -504,6 +575,12 @@ type Mutation {
   updateUsers(data: [UserUpdateArgs!]!): [User]
   deleteUser(where: UserWhereUniqueInput!): User
   deleteUsers(where: [UserWhereUniqueInput!]!): [User]
+  createComment(data: CommentCreateInput!): Comment
+  createComments(data: [CommentCreateInput!]!): [Comment]
+  updateComment(where: CommentWhereUniqueInput!, data: CommentUpdateInput!): Comment
+  updateComments(data: [CommentUpdateArgs!]!): [Comment]
+  deleteComment(where: CommentWhereUniqueInput!): Comment
+  deleteComments(where: [CommentWhereUniqueInput!]!): [Comment]
   createModel(data: ModelCreateInput!): Model
   createModels(data: [ModelCreateInput!]!): [Model]
   updateModel(where: ModelWhereUniqueInput!, data: ModelUpdateInput!): Model
@@ -542,6 +619,9 @@ type Query {
   users(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0): [User!]
   user(where: UserWhereUniqueInput!): User
   usersCount(where: UserWhereInput! = {}): Int
+  comments(where: CommentWhereInput! = {}, orderBy: [CommentOrderByInput!]! = [], take: Int, skip: Int! = 0): [Comment!]
+  comment(where: CommentWhereUniqueInput!): Comment
+  commentsCount(where: CommentWhereInput! = {}): Int
   models(where: ModelWhereInput! = {}, orderBy: [ModelOrderByInput!]! = [], take: Int, skip: Int! = 0): [Model!]
   model(where: ModelWhereUniqueInput!): Model
   modelsCount(where: ModelWhereInput! = {}): Int

@@ -51,6 +51,19 @@ model User {
   likedModels   Model[]      @relation("Model_likedBy")
   createdImages ModelImage[] @relation("ModelImage_createdBy")
   createdFiles  ModelFile[]  @relation("ModelFile_createdBy")
+  comments      Comment[]    @relation("Comment_author")
+}
+
+model Comment {
+  id       String  @id @default(cuid())
+  model    Model?  @relation("Comment_model", fields: [modelId], references: [id])
+  modelId  String? @map("model")
+  author   User?   @relation("Comment_author", fields: [authorId], references: [id])
+  authorId String? @map("author")
+  content  Json    @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+
+  @@index([modelId])
+  @@index([authorId])
 }
 
 model Model {
@@ -62,9 +75,10 @@ model Model {
   createdAt           DateTime?    @default(now())
   createdBy           User?        @relation("Model_createdBy", fields: [createdById], references: [id])
   createdById         String?      @map("createdBy")
+  comments            Comment[]    @relation("Comment_model")
   likedBy             User[]       @relation("Model_likedBy")
   slug                String       @unique @default("")
-  recommendedInfill   Decimal?     @postgresql.Decimal(18, 4)
+  recommendedInfill   Int?
   recommendedMaterial String?
   supports            String?
 

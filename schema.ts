@@ -12,9 +12,10 @@ import {
     image,
     timestamp,
     virtual,
-    decimal,
     select,
+    integer,
 } from '@keystone-6/core/fields';
+import { document } from '@keystone-6/fields-document';
 
 import type { Lists } from '.keystone/types';
 
@@ -156,7 +157,8 @@ export const lists: Lists = {
             createdModels: relationship({ ref: 'Model.createdBy', many: true }),
             likedModels: relationship({ ref: 'Model.likedBy', many: true }),
             createdImages: relationship({ ref: 'ModelImage.createdBy', many: true }),
-            createdFiles: relationship({ ref: 'ModelFile.createdBy', many: true })
+            createdFiles: relationship({ ref: 'ModelFile.createdBy', many: true }),
+            comments: relationship({ ref: "Comment.author", many: true }),
         },
         access: {
             operation: {
@@ -186,6 +188,66 @@ export const lists: Lists = {
             }
         }
     }),
+    Comment: list({
+        fields: {
+            model: relationship({ ref: "Model.comments" }),
+            author: relationship({ ref: "User.comments" }),
+            content: document({
+                formatting: true,
+                dividers: true,
+                links: true,
+                layouts: [
+                  [1, 1],
+                  [1, 1, 1],
+                ],
+              }),
+        },
+        access: {
+            operation: {
+                query: allowAll,
+                update: allowAll,
+                delete: allowAll,
+                create: allowAll
+            },
+            item: {
+                create: async ({ session }) => {
+                    const username = session?.data.username as string;
+                    if (!username) {
+                        return false;
+                    }
+                    return true;
+                },
+                update: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    return canEdit;
+                },
+                delete: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    return canEdit;
+                }
+            }
+        }
+    }),
     Model: list({
         fields: {
             name: text({
@@ -200,6 +262,7 @@ export const lists: Lists = {
                     labelField: 'username'
                 }
             }),
+            comments: relationship({ ref: "Comment.model", many: true }),
             likedBy: relationship({
                 ref: 'User.likedModels', many: true, ui: {
                     labelField: "username",
@@ -240,7 +303,7 @@ export const lists: Lists = {
                     },
                 },
             }),
-            recommendedInfill: decimal({ validation: { min: "0", max: "100" } }),
+            recommendedInfill: integer({ validation: { min: 0, max: 100 } }),
             recommendedMaterial: select({
                 options: [
                     { label: "PLA", value: "pla" },

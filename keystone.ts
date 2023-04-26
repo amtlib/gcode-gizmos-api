@@ -37,7 +37,6 @@ export default withAuth(
         region: S3_REGION,
         accessKeyId: S3_ACCESS_KEY_ID,
         secretAccessKey: S3_SECRET_ACCESS_KEY,
-        signed: { expiry: 5000 },
       },
       model_images: {
         kind: 's3',
@@ -47,7 +46,6 @@ export default withAuth(
         region: S3_REGION,
         accessKeyId: S3_ACCESS_KEY_ID,
         secretAccessKey: S3_SECRET_ACCESS_KEY,
-        signed: { expiry: 5000 },
       }
     },
     graphql: {

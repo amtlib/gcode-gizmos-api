@@ -229,7 +229,7 @@ export const lists: Lists = {
                     if (!username) {
                         return false;
                     }
-                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    const canEdit = await (item.authorId === user.id || await isAdmin(username, context));
                     return canEdit;
                 },
                 delete: async ({ session, context, item }) => {
@@ -243,7 +243,7 @@ export const lists: Lists = {
                     if (!username) {
                         return false;
                     }
-                    const canEdit = await (item.createdById === user.id || await isAdmin(username, context));
+                    const canEdit = await (item.authorId === user.id || await isAdmin(username, context));
                     return canEdit;
                 }
             }

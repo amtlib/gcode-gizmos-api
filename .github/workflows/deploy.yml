@@ -59,4 +59,6 @@ jobs:
             docker pull ghcr.io/amtlib/gcode-gizmos-api/gcode-gizmos-api:latest
             cd gcode-gizmos-api
             git pull
+            sleep 2
             docker-compose up -d
+            sleep 5

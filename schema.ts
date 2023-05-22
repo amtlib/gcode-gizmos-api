@@ -20,6 +20,58 @@ import { document } from '@keystone-6/fields-document';
 import type { Lists } from '.keystone/types';
 
 export const lists: Lists = {
+    Rating: list({
+        fields: {
+            user: relationship({ ref: "User.ratings"}),
+            model: relationship({ ref: "Model.ratings"}),
+            score: integer({ validation: {min: 1, max: 5}})
+        },
+        access: {
+            operation: {
+                query: allowAll,
+                update: allowAll,
+                delete: allowAll,
+                create: allowAll
+            },
+            item: {
+                create: async ({ session }) => {
+                    const username = session?.data.username as string;
+                    if (!username) {
+                        return false;
+                    }
+                    return true;
+                },
+                update: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.userId === user.id || await isAdmin(username, context));
+                    return canEdit;
+                },
+                delete: async ({ session, context, item }) => {
+                    const username = session?.data.username as string;
+                    const user = await context.query.User.findOne({
+                        where: {
+                            username
+                        },
+                        query: `id`
+                    })
+                    if (!username) {
+                        return false;
+                    }
+                    const canEdit = await (item.userId === user.id || await isAdmin(username, context));
+                    return canEdit;
+                }
+            }
+        }
+    }),
     ModelImage: list({
         fields: {
             model: relationship({ ref: 'Model.images' }),
@@ -159,6 +211,7 @@ export const lists: Lists = {
             createdImages: relationship({ ref: 'ModelImage.createdBy', many: true }),
             createdFiles: relationship({ ref: 'ModelFile.createdBy', many: true }),
             comments: relationship({ ref: "Comment.author", many: true }),
+            ratings: relationship({ ref: "Rating.user", many: true })
         },
         access: {
             operation: {
@@ -328,6 +381,7 @@ export const lists: Lists = {
                     { label: "Doesn't matter", value: "n/a" },
                 ]
             }),
+            ratings: relationship({ ref: "Rating.model", many: true })
         },
         hooks: {
             afterOperation: async ({ operation, item, context }) => {
@@ -385,6 +439,5 @@ export const lists: Lists = {
                 }
             }
         }
-    })
-
+    }),
 };

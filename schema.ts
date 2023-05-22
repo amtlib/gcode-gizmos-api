@@ -353,6 +353,37 @@ export const lists: Lists = {
 
                 }),
             }),
+            userRating: virtual({
+                ui: {
+                    itemView: { fieldMode: 'hidden' },
+                    listView: { fieldMode: 'hidden' }
+                },
+                field: graphql.field({
+                    type: graphql.Float,
+                    async resolve(item, args, context) {
+                        if (context.session?.itemId) {
+                            const userRating = await context.query.Model.findOne({ where: { id: item.id }, query: `ratings(where: {user: {id: {equals: "${context.session.itemId}"}}}) {score}`})
+                            return userRating.ratings?.[0]?.score || 0;
+                        }
+                        return 0;
+                    },
+
+                }),
+            }),
+            ratingsAvg: virtual({
+                ui: {
+                    itemView: { fieldMode: 'hidden' },
+                    listView: { fieldMode: 'hidden' }
+                },
+                field: graphql.field({
+                    type: graphql.Float,
+                    async resolve(item, args, context) {
+                        const modelRatings = await context.query.Model.findOne({ where: { id: item.id }, query: `ratings {score} ratingsCount`})
+                        return modelRatings.ratings.reduce((acc: number, curr: { score: number }) => curr.score + acc, 0) / (modelRatings.ratingsCount || 1)
+                    },
+
+                }),
+            }),
             slug: text({
                 isIndexed: 'unique',
                 hooks: {

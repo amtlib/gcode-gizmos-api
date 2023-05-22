@@ -499,6 +499,8 @@ type Model {
   likedBy(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0): [User!]
   likedByCount(where: UserWhereInput! = {}): Int
   doUserLikesIt: Boolean
+  userRating: Float
+  ratingsAvg: Float
   slug: String
   recommendedInfill: Int
   recommendedMaterial: String

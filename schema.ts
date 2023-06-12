@@ -384,41 +384,6 @@ export const lists: Lists = {
 
                 }),
             }),
-            rate: virtual({
-                ui: {
-                    itemView: { fieldMode: 'hidden' },
-                    listView: { fieldMode: 'hidden' }
-                },
-                field: graphql.field({
-                    type: graphql.Boolean,
-                    args: {
-                        score: graphql.arg({ type: graphql.Int })
-                    },
-                    async resolve(item, args, context, info) {
-                        const username = context.session?.data.username as string;
-                        if (!username) {
-                            return false;
-                        }
-                        const user = await context.query.User.findOne({
-                            where: {
-                                username
-                            },
-                            query: `id`
-                        })
-                    
-                        const foundRate = await context.query.Rating.findMany({where: {user: {id: {equals: user.id}}, model: {id: {equals: item.id}}}});
-                        if (foundRate[0]?.id) {
-                            // update existing rate
-                            await context.query.Rating.updateOne({ where: {id: foundRate[0].id}, data: { score: args.score}});
-                            return true;
-                        } else {
-                            // create new rate
-                            await context.query.Rating.createOne({ data: {user: {connect: {id: user.id}}, model: {connect: {id: item.id}}, score: args.score}})
-                        }
-                        return true;
-                    }
-                })
-            }),
             slug: text({
                 isIndexed: 'unique',
                 hooks: {

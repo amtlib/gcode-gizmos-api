@@ -501,7 +501,6 @@ type Model {
   doUserLikesIt: Boolean
   userRating: Float
   ratingsAvg: Float
-  rate(score: Int): Boolean
   slug: String
   recommendedInfill: Int
   recommendedMaterial: String
@@ -677,6 +676,7 @@ type Mutation {
   endSession: Boolean!
   authenticateUserWithPassword(username: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
+  rateModel(score: Int, modelSlug: String): Boolean
 }
 
 union UserAuthenticationWithPasswordResult = UserAuthenticationWithPasswordSuccess | UserAuthenticationWithPasswordFailure

@@ -1,4 +1,4 @@
-import { config } from '@keystone-6/core';
+import { config, graphql } from '@keystone-6/core';
 import dotenv from 'dotenv';
 import { lists } from './schema';
 import { withAuth, session } from './auth';
@@ -53,6 +53,42 @@ export default withAuth(
       apolloConfig: {
         introspection: true
       }
-    }
+    },
+    extendGraphqlSchema: graphql.extend(base => {
+      return {
+        mutation: {
+          rateModel: graphql.field({
+            type: graphql.Boolean,
+            args: {
+              score: graphql.arg({ type: graphql.Int }),
+              modelSlug: graphql.arg({ type: graphql.String }),
+            },
+            async resolve(item, args, context, info) {
+              const username = context.session?.data.username as string;
+              if (!username) {
+                return false;
+              }
+              const user = await context.query.User.findOne({
+                where: {
+                  username
+                },
+                query: `id`
+              })
+
+              const foundRate = await context.query.Rating.findMany({ where: { user: { id: { equals: user.id } }, model: { slug: { equals: args.modelSlug } } } });
+              if (foundRate[0]?.id) {
+                // update existing rate
+                await context.query.Rating.updateOne({ where: { id: foundRate[0].id }, data: { score: args.score } });
+                return true;
+              } else {
+                // create new rate
+                await context.query.Rating.createOne({ data: { user: { connect: { id: user.id } }, model: { connect: { slug: args.modelSlug } }, score: args.score } })
+              }
+              return true;
+            }
+          })
+        }
+      }
+    })
   })
 );

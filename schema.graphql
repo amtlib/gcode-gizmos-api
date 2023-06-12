@@ -501,6 +501,7 @@ type Model {
   doUserLikesIt: Boolean
   userRating: Float
   ratingsAvg: Float
+  rate(score: Int): Boolean
   slug: String
   recommendedInfill: Int
   recommendedMaterial: String

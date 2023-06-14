@@ -11,7 +11,7 @@
     "gen:migration": "keystone prisma migrate dev --create-only"
   },
   "dependencies": {
-    "@keystone-6/auth": "^5.0.0",
+    "@keystone-6/auth": "^7.0.0",
     "@keystone-6/core": "^3.0.1",
     "@keystone-6/fields-document": "^5.0.0",
     "dotenv": "^16.0.3",
